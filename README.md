@@ -69,7 +69,7 @@ https://drive.google.com/file/d/1VA20kgYX-ubQPDXsGjDpENNvFGuf_aH5/view?usp=shari
 1. UpdateModel
 	1. In this final node, the latest model is pushed into the huggingface repository and automatically updated on its server. As such, from that moment on, any inference carried out by the user is conducted by the latest model.
 
-###Simulating Live Data
+### Simulating Live Data
 Morover, we also stimulated User's usage of our System. That is to say, we created a script pretends to be a user specifying a Context and a Question. This information is sent to two different endpoints of the FastApi. One endpoints returns the answer of the question in the context to the User while the other Endpoint proceeds to dump the datapoint into our main data storage. 
 
 ## Way Forward
