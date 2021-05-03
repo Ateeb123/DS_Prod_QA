@@ -42,15 +42,40 @@ On the model experimentation side, we achieved the following:
 | Euclidean Distance | 0.4004383611685065  |
 | Cosine Similarity |0.4905877920980833  |
 
+##Transfer Learning with Distilbert-Base-Uncased
+We used DistilBERT as the base model and fine-tuned it for the Squad Dataset. 
+The fine-tuned model  predicts a start position and an end position in the passage, in accordance with the text and context provided by the user. 
+The model absorbs the data from the Azure Cosmos DB, proceeds to pre-process it including its tokenization so that its mathematically computable and proceeds use the Adam Optimizer to perform transfer learning on DistillBERT. 
+We run the model at 0.00005 learning with the batch size as 16 and epoch 10. 
+
+## Pipeline - Dagster
+Having trained the model through Transfer Learning, now we need to connect all the pipes together. There must be a sequential automated line of execution starting from the fetch of data from the database to the pre-processing, training, validation and deployment of it. 
+For that purpose, we used Dagster.  The image uploaded below depicts the stages in the execution of our pipeline:
+https://drive.google.com/file/d/1VA20kgYX-ubQPDXsGjDpENNvFGuf_aH5/view?usp=sharing
+- There are 5 Solid Blocks/Nodes of computation in a pipeline:
+
+1. Fetch Data
+	1. This node fetches the data from the Azure Cosmos DB into the memory
+
+1. PreProcessModel
+	1. Data Fetched is  Preprocessed accordingly. This includes tagging of answers in the context and tokenization of the relevant text. 
+
+1. TrainModel
+	1. A model, with DistillBert as its base form, is fine-tuned on the ProProcessed Data using Adam as the Optimizer and 0.0005 learning ratet. 
+
+1. ValidateModel
+	1. Validation is carred out the Trained Model. 
+	
+1. UpdateModel
+	1. In this final node, the latest model is pushed into the huggingface repository and automatically updated on its server. As such, from that moment on, any inference carried out by the user is conducted by the latest model.
+
+###Simulating Live Data
+Morover, we also stimulated User's usage of our System. That is to say, we created a script pretends to be a user specifying a Context and a Question. This information is sent to two different endpoints of the FastApi. One endpoints returns the answer of the question in the context to the User while the other Endpoint proceeds to dump the datapoint into our main data storage. 
 
 ## Way Forward
 ### Infrastructure
 On the infrastructure side, the following are the aims:
--	Create the needed link and pipeline between the Data Storage and Api. 
-The pipeline would facilitate real-time and immediate provision of data to whichever type of model that needs to be trained. The pipeline would, further, facilitate re-training of the models once new data keeps entering the Data Storage. 
-- Investigate Dagster and Azure Pipelines for the construction of this path. 
-- Extend the pipeline to work end-to-end. That is to say, from the provision of data to training and re-training of models and finally, to the automated deployment of the latest model. 
+-	Study and Integrate MLOps for monitoring of our models when they are retrained and deployed through Dagster. 
 
 ### Experimentation Models
--	We will be using BERT (Bidirectional Encoder Representations from Transformers) pre-trained model, fine-tune it as per our data and add a custom model to it to increase its benchmark accuracy on our dataset.
-The accuracy we achieved in our model above is low as many advanced techniques are already applied with greater accuracy, but using these models we have learnt and explore our dataset at a lower level which will help in fine-tuning and enhancing accuracy in later steps
+-	While we did use DistillBert for Transfer Learning, we could not determine the accuracy and reliability of our model since we were unable to fine-tune the model on the whole dataset given its massive size.  We need to further tackle that through ML techniques such as pruning. 
