@@ -4,8 +4,8 @@ import requests
 class InferenceModel:
 
     def __init__(self) -> None:
-        self.headers = {"Authorization": f"Bearer {apikey}"}
-        self.API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
+        self.API_URL = "https://api-inference.huggingface.co/models/Ateeb/QA"
+        self.headers = {"Authorization": "Bearer api_DHnvjPKdjmjkmEYQubgvmIKJqWaNNYljaF"}
 
 
 
