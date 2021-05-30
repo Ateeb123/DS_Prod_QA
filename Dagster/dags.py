@@ -81,6 +81,17 @@ def TrainModel(context, item_list):
             optim.step()
     print("Done")
     model.eval()
+    return model, data
+
+
+@solid
+def ValidateModel(context, item_list):
+    context.log.info("Validating Model")
+    return item_list
+
+@solid
+def UpdateModel(context, item_list):
+    model, data = item_list
     model.save_pretrained("../Model_Experimentations/QA")
     data.tokenizer.save_pretrained("../Model_Experimentations/QA")
     os.chdir("../Model_Experimentations/QA")
@@ -88,33 +99,24 @@ def TrainModel(context, item_list):
     subprocess.call(["git", "status"])
     subprocess.call(["git", "commit", "-m", "Updated version of the your-model-name model and tokenizer."])
     subprocess.call(["git", "push"])
-
-
-@solid
-def ValidateModel(context, item_list):
-    context.log.info("Validating Model")
-
-@solid
-def UpdateModel(context):
     context.log.info("Updating Model")
 
 
 @pipeline
-def hello_cereal_pipeline():
+def DSPipeline():
     data = Model()
     container = "livecheckcontainer"
-    TrainModel(PreProcessModel(FetchData()))
-
-    pass
+    UpdateModel(ValidateModel(TrainModel(PreProcessModel(FetchData()))))
 
 
 @daily_schedule(
-    pipeline_name="hello_cereal_pipeline",
+    pipeline_name="DSPipeline",
     start_date=datetime(2020, 6, 1),
     execution_time=time(6, 45),
     execution_timezone="US/Central",
 )
-def good_morning_schedule(date):
+
+def DailyUpdationSchedule(date):
     return {
         "solids": {
             "hello_cereal": {
@@ -125,4 +127,4 @@ def good_morning_schedule(date):
 
 @repository
 def hello_cereal_repository():
-    return [hello_cereal_pipeline, good_morning_schedule]
+    return [DSPipeline, DailyUpdationSchedule]

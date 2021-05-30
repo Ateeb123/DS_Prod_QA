@@ -52,5 +52,5 @@ DownloadDataset(dataset)
 blob_service_client = CreateContainer(connectionString, containerName)
 
 UploadBlobToContainer(containerName, "squad-train.arrow", blob_service_client)
-UploadBlobToContainer(containerName, "squad-validation.arrow", blob_service_client)
+# UploadBlobToContainer(containerName, "squad-validation.arrow", blob_service_client)
 
